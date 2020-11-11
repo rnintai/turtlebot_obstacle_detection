@@ -107,10 +107,7 @@ ODS();
     bool is_ObsDetected(const std::vector<double>& _ranges);
     void scanObsSections(const std::vector<double>& _ranges);
 
-    /**
-     * At first, go forward centi, then turn 90 degree.
-     * */
-    void reachingObs(int centi);
+ 
 
 private:
     ros::NodeHandle nh_;
@@ -203,40 +200,9 @@ void ODS::run(){
     twist_pub_ = nh_.advertise<geometry_msgs::Twist>("cmd_vel",queue_size,true); // true?
     pose_pub_ = nh_.advertise<geometry_msgs::Pose2D>("pose2D",1);
 
-    reachingObs(params_.initial_centi);
+
 }
 
-void ODS::reachingObs(int centi){
-  ros::Duration five_sec(5.0);
-  ros::Duration two_sec(2.0);
-  ros::Duration one_sec(1.0);
-
-  ros::Rate freq(10);
-
-  ros::Time now;
-  ros::Time time = ros::Time::now();
-
-  while((now = ros::Time::now()) <= time + five_sec){
-    publishTwist(params_.drive_linvel, 0.0);
-    ROS_INFO("reachingObs : go forward");
-    freq.sleep();
-  }
-
-  time = ros::Time::now();
-  while((now = ros::Time::now()) <= time + two_sec){
-    publishTwist(0.0, M_PI/4);
-    ROS_INFO("reachingObs : turn 90 degree");
-    freq.sleep();
-  }
-
-  time = ros::Time::now();
-  while((now = ros::Time::now()) <= time + one_sec){
-    publishTwist(0.0,0.0);
-    ROS_INFO("reachingObs : stop");
-    freq.sleep();
-  }
-  
-}
 
 void ODS::publishTwist(const double _lin_vel, const double _ang_vel){
     geometry_msgs::Twist vel;
